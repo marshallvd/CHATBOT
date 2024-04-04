@@ -1,0 +1,13 @@
+def faktorial(n):
+    if n == 0:
+        print("Langkah basis: faktorial(0) = 1")
+        return 1
+    else:
+        print("Langkah rekursif: faktorial(", n, ") = ", n, " * faktorial(", n-1, ")", sep='')
+        return n * faktorial(n-1)
+
+# Input nilai faktorial dari pengguna
+angka = int(input("Masukkan nilai faktorial yang ingin dihitung: "))
+
+# Cetak hasil faktorial
+print("Faktorial dari", angka, "adalah", faktorial(angka))
