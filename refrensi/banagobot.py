@@ -36,6 +36,16 @@ def create_connection():
     return connection
 
 
+# Fungsi untuk mengambil menu dari database
+async def get_menu_from_database():
+    connection = create_connection()
+    menu = []
+    if connection is not None:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM tb_menu")  # Perbarui tabel menu di sini
+        menu = cursor.fetchall()
+        connection.close()
+    return menu
 
 # Fungsi handle_message yang telah dimodifikasi untuk menyimpan pesan dan respon bot
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -92,43 +102,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         connection.close()
         print("Connection closed")
 
-
-
-
-
-# Fungsi untuk mengambil menu dari database
-async def get_menu_from_database():
-    connection = create_connection()
-    menu = []
-    if connection is not None:
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM tb_menu")  # Perbarui tabel menu di sini
-        menu = cursor.fetchall()
-        connection.close()
-    return menu
-
-
-# Fungsi untuk memasukkan pesan dari pengguna ke dalam tabel database
-def insert_message(connection, message, chat_id, message_type):
-    cursor = connection.cursor()
-    try:
-        cursor.execute("INSERT INTO tb_inbox (message_content, chat_id, message_type) VALUES (%s, %s, %s)",
-        (message, chat_id, message_type))
-        connection.commit()
-        print("Message inserted successfully")
-    except Error as e:
-        print(f"The error '{e}' occurred")
-
-# Fungsi untuk memasukkan respon bot ke dalam tabel database
-def insert_bot_response(connection, response_content, chat_id, message_id):
-    cursor = connection.cursor()
-    try:
-        cursor.execute("INSERT INTO tb_outbox (response_content, chat_id, id_inbox) VALUES (%s, %s, %s)",
-        (response_content, chat_id, message_id))
-        connection.commit()
-        print("Bot response inserted successfully")
-    except Error as e:
-        print(f"The error '{e}' occurred")
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -202,6 +175,27 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         print(f"Error in button_callback: {e}")
 
 
+# Fungsi untuk memasukkan pesan dari pengguna ke dalam tabel database
+def insert_message(connection, message, chat_id, message_type):
+    cursor = connection.cursor()
+    try:
+        cursor.execute("INSERT INTO tb_inbox (message_content, chat_id, message_type) VALUES (%s, %s, %s)",
+        (message, chat_id, message_type))
+        connection.commit()
+        print("Message inserted successfully")
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+# Fungsi untuk memasukkan respon bot ke dalam tabel database
+def insert_bot_response(connection, response_content, chat_id, message_id):
+    cursor = connection.cursor()
+    try:
+        cursor.execute("INSERT INTO tb_outbox (response_content, chat_id, id_inbox) VALUES (%s, %s, %s)",
+        (response_content, chat_id, message_id))
+        connection.commit()
+        print("Bot response inserted successfully")
+    except Error as e:
+        print(f"The error '{e}' occurred")
 
 # Command Default
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
